@@ -9,11 +9,20 @@ let solutionGrid = [];
 let selectedCell = null;  
 let isNotesMode = false;
 let timerInterval;
+let timeElapsed = 0; 
+let isPaused = false;
+// Read data from localStorage, defaulting to 0 or empty structures
 let streak = parseInt(localStorage.getItem('sudokuStreak')) || 0;
 let lastPlayedDate = localStorage.getItem('sudokuLastPlayed') || null;
+let lifetimeSolves = parseInt(localStorage.getItem('sudokuLifetimeSolves')) || 0;
+let badgesEarned = JSON.parse(localStorage.getItem('sudokuBadges')) || [];
+
 
 // --- DOM Elements ---
 const gridEl = document.getElementById('sudoku-grid');
+const pauseBtn = document.getElementById('pause-btn');
+const restartTimerBtn = document.getElementById('restart-timer-btn');
+const timerEl = document.getElementById('timer');
 const padEl = document.getElementById('number-pad');
 const newGameBtn = document.getElementById('new-game-btn');
 const eraseBtn = document.getElementById('erase-btn');
@@ -23,10 +32,12 @@ const difficultySelect = document.getElementById('difficulty-select');
 const modeToggleBtn = document.getElementById('mode-toggle');
 const streakDisplay = document.getElementById('streak-display');
 const dailyFactText = document.getElementById('daily-fact-text');
+const lifetimeSolvesDisplay = document.querySelector('.stat-box:nth-child(3) .large-text'); 
+const badgesListEl = document.getElementById('badges-list');
 const body = document.body;
 
 
-// --- Daily Fact Data ---
+// --- Daily Fact Data (Remains the same) ---
 const dailyFacts = [
     "Your brain uses about 20% of the oxygen and calories you consume, even when you're resting.",
     "Learning new complex skills, like Sudoku, actively promotes the growth of new neural connections.",
@@ -38,7 +49,7 @@ const dailyFacts = [
     "Your brain processes information faster than a computer can handle: visual information is processed in only 13 milliseconds.",
 ];
 
-// --- Puzzle Generation Blueprint (Function remains the same) ---
+// --- Puzzle Generation Blueprint (Remains the same) ---
 function generateUniquePuzzle(difficulty) {
     const fullSolution1D = [5, 3, 4, 6, 7, 8, 9, 1, 2, 6, 7, 2, 1, 9, 5, 3, 4, 8, 1, 9, 8, 3, 4, 2, 5, 6, 7, 8, 5, 9, 7, 6, 1, 4, 2, 3, 4, 2, 6, 8, 5, 3, 7, 9, 1, 7, 1, 3, 9, 2, 4, 8, 5, 6, 9, 6, 1, 5, 3, 7, 2, 8, 4, 2, 8, 7, 4, 1, 9, 6, 3, 5, 3, 4, 5, 2, 8, 6, 1, 7, 9];
     let startPuzzle1D = [...fullSolution1D];
@@ -72,10 +83,12 @@ function generateUniquePuzzle(difficulty) {
 }
 
 
-// --- Utility Functions ---
+// --- CORE STATS UPDATE FUNCTIONS ---
 
-function getTodayDateString() {
-    return new Date().toISOString().split('T')[0];
+function updateLifetimeSolves() {
+    lifetimeSolves += 1;
+    localStorage.setItem('sudokuLifetimeSolves', lifetimeSolves);
+    lifetimeSolvesDisplay.textContent = lifetimeSolves;
 }
 
 function updateStreak(solvedToday) {
@@ -100,6 +113,32 @@ function updateStreak(solvedToday) {
     streakDisplay.textContent = `${streak} Day${streak !== 1 ? 's' : ''}`;
 }
 
+function grantBadge(badgeName, notificationText) {
+    if (!badgesEarned.includes(badgeName)) {
+        badgesEarned.push(badgeName);
+        localStorage.setItem('sudokuBadges', JSON.stringify(badgesEarned));
+        
+        // Show notification and update UI
+        alert(`⭐ Badge Unlocked! ${notificationText}`);
+        renderBadges();
+    }
+}
+
+function renderBadges() {
+    badgesListEl.innerHTML = '';
+    if (badgesEarned.length === 0) {
+        badgesListEl.innerHTML = '<li>No badges earned yet.</li>';
+        return;
+    }
+    badgesEarned.forEach(badge => {
+        const li = document.createElement('li');
+        li.textContent = badge;
+        badgesListEl.appendChild(li);
+    });
+}
+
+// --- INITIALIZATION UTILITIES ---
+
 function displayDailyFact() {
     const today = new Date();
     const startOfYear = new Date(today.getFullYear(), 0, 0);
@@ -111,8 +150,52 @@ function displayDailyFact() {
     dailyFactText.textContent = dailyFacts[factIndex];
 }
 
+function formatTime(seconds) {
+    const min = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const sec = String(seconds % 60).padStart(2, '0');
+    return `${min}:${sec}`;
+}
 
-// --- Cell Highlighting Logic ---
+// --- TIMER CONTROLS LOGIC ---
+
+function startTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    isPaused = false;
+    pauseBtn.textContent = '⏸️ Pause';
+
+    timerInterval = setInterval(() => {
+        if (!isPaused) {
+            timeElapsed++;
+            timerEl.textContent = formatTime(timeElapsed);
+        }
+    }, 1000);
+}
+
+function pauseTimer() {
+    isPaused = true;
+    pauseBtn.textContent = '▶️ Resume';
+}
+
+function resumeTimer() {
+    isPaused = false;
+    pauseBtn.textContent = '⏸️ Pause';
+}
+
+function togglePause() {
+    if (isPaused) {
+        resumeTimer();
+    } else {
+        pauseTimer();
+    }
+}
+
+function resetTimer() {
+    timeElapsed = 0;
+    timerEl.textContent = formatTime(timeElapsed);
+    startTimer();
+}
+
+// --- CELL HIGHLIGHTING LOGIC ---
 
 function removeHighlights() {
     document.querySelectorAll('.cell').forEach(cell => {
@@ -121,7 +204,6 @@ function removeHighlights() {
 }
 
 function applyHighlights(r, c) {
-    // 1. Highlight the entire row and column
     for (let i = 0; i < 9; i++) {
         const rowCell = gridEl.children[r * 9 + i];
         const colCell = gridEl.children[i * 9 + c];
@@ -130,7 +212,6 @@ function applyHighlights(r, c) {
         if (colCell && colCell !== selectedCell) colCell.classList.add('highlight');
     }
 
-    // 2. Highlight the 3x3 block
     const startRow = Math.floor(r / 3) * 3;
     const startCol = Math.floor(c / 3) * 3;
 
@@ -144,7 +225,7 @@ function applyHighlights(r, c) {
     }
 }
 
-// --- Game Controls and UI Logic ---
+// --- GAME CONTROLS AND UI LOGIC ---
 
 function renderGrid() {
     gridEl.innerHTML = ''; 
@@ -180,19 +261,21 @@ function renderGrid() {
 }
 
 function selectCell(event) {
-    removeHighlights(); // Remove all previous highlights
+    if (isPaused) return; 
+
+    removeHighlights(); 
 
     selectedCell = event.target;
-    selectedCell.classList.add('selected'); // Add selection highlight
+    selectedCell.classList.add('selected'); 
 
     const r = parseInt(selectedCell.dataset.row);
     const c = parseInt(selectedCell.dataset.col);
     
-    applyHighlights(r, c); // Apply contextual highlights
+    applyHighlights(r, c); 
 }
 
 function handleNumberInput(value) {
-    if (!selectedCell) return;
+    if (isPaused || !selectedCell) return; 
 
     const r = parseInt(selectedCell.dataset.row);
     const c = parseInt(selectedCell.dataset.col);
@@ -218,8 +301,12 @@ function handleNumberInput(value) {
 }
 
 function startGame(difficulty) {
+    // Reset timer state for new game
+    timeElapsed = 0; 
+    timerEl.textContent = formatTime(timeElapsed);
+
     clearInterval(timerInterval);
-    removeHighlights(); // Ensure no cells are highlighted on new game
+    removeHighlights(); 
     const puzzle = generateUniquePuzzle(difficulty);
     currentGrid = puzzle.currentGrid;
     solutionGrid = puzzle.solutionGrid;
@@ -228,22 +315,15 @@ function startGame(difficulty) {
     isNotesMode = false;
     renderGrid();
     startTimer();
-    updateStreak(false); 
-}
-
-function startTimer() {
-    let seconds = 0;
-    const timerEl = document.getElementById('timer');
-    timerInterval = setInterval(() => {
-        seconds++;
-        const min = String(Math.floor(seconds / 60)).padStart(2, '0');
-        const sec = String(seconds % 60).padStart(2, '0');
-        timerEl.textContent = `${min}:${sec}`;
-    }, 1000);
+    updateStreak(false); // Update streak display only
+    
+    // Update dashboard elements on game start
+    lifetimeSolvesDisplay.textContent = lifetimeSolves;
+    renderBadges();
 }
 
 function handleErase() {
-    if (!selectedCell) return;
+    if (isPaused || !selectedCell) return;
     const r = parseInt(selectedCell.dataset.row);
     const c = parseInt(selectedCell.dataset.col);
 
@@ -255,6 +335,8 @@ function handleErase() {
 }
 
 function handleNotesToggle() {
+    // FIX: This function should only check for pause, not if the event listener is working.
+    if (isPaused) return; 
     isNotesMode = !isNotesMode;
     notesBtn.textContent = isNotesMode ? '✅ Notes ON' : '✏️ Notes Mode';
     notesBtn.classList.toggle('primary-btn', isNotesMode);
@@ -262,6 +344,7 @@ function handleNotesToggle() {
 }
 
 function checkSolution() {
+    if (isPaused) return; 
     let errors = 0;
     let complete = true;
     for (let r = 0; r < 9; r++) {
@@ -281,8 +364,15 @@ function checkSolution() {
 
     if (errors === 0 && complete) {
         clearInterval(timerInterval);
-        alert('🏆 Grandmaster! Puzzle Solved Perfectly. Namaste!');
+        isPaused = true; 
+        
+        // ⭐ SUCCESS ACTIONS! ⭐
         updateStreak(true); 
+        updateLifetimeSolves(); 
+        grantBadge("Solver Starter", "You've solved your very first puzzle!"); 
+        
+        alert('🏆 Grandmaster! Puzzle Solved Perfectly. Namaste!');
+        
     } else if (errors > 0) {
         alert(`❌ Reviewing Progress: You have ${errors} error(s) on the board (marked in red). Fix them to proceed!`);
     } else if (!complete) {
@@ -291,8 +381,7 @@ function checkSolution() {
 }
 
 
-// --- Mode Toggle Logic (Functions remain the same) ---
-
+// --- Mode Toggle Logic (Remains the same) ---
 function toggleDarkMode() {
     body.classList.toggle('light-mode');
     if (body.classList.contains('light-mode')) {
@@ -316,16 +405,25 @@ function loadModePreference() {
 
 
 // --- Event Listeners and Initial Load ---
+// FINAL CHECK: Ensure all elements are linked here!
+
+// Standard Controls
 modeToggleBtn.addEventListener('click', toggleDarkMode);
 newGameBtn.addEventListener('click', () => {
     startGame(difficultySelect.value);
 });
+
+// Game Controls
 eraseBtn.addEventListener('click', handleErase);
-notesBtn.addEventListener('click', handleNotesToggle);
-checkBtn.addEventListener('click', checkSolution);
+notesBtn.addEventListener('click', handleNotesToggle); // Notes mode should now work
+checkBtn.addEventListener('click', checkSolution);      // Check button should now work
 document.getElementById('hint-btn').addEventListener('click', () => {
     alert('Hint: Focus on a 3x3 box that is nearly full. This will give you the easiest number to place!');
 });
+
+// Timer Controls
+pauseBtn.addEventListener('click', togglePause);
+restartTimerBtn.addEventListener('click', resetTimer);
 
 
 // Load the preferred mode and start the first game
