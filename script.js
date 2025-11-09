@@ -1,8 +1,7 @@
 /*
  * SUDOKU DAILY Core Game Logic and UI Enhancements
  *
- * NOTE: This is the final version implementing functional Notes Mode,
- * Intelligent Hint, and robust Stat/Badge updating.
+ * NOTE: This final version removes the Lifetime Solves feature entirely.
  */
 
 // --- Game State Variables ---
@@ -18,12 +17,11 @@ let isPaused = false;
 // Read data from localStorage, defaulting to 0 or empty structures
 let streak = parseInt(localStorage.getItem('sudokuStreak')) || 0;
 let lastPlayedDate = localStorage.getItem('sudokuLastPlayed') || null;
-let lifetimeSolves = parseInt(localStorage.getItem('sudokuLifetimeSolves')) || 0;
+// Removed: lifetimeSolves variable
 let badgesEarned = JSON.parse(localStorage.getItem('sudokuBadges')) || [];
 
 
 // --- DOM Elements ---
-// (These are fine outside the function as they are static IDs)
 const gridEl = document.getElementById('sudoku-grid');
 const pauseBtn = document.getElementById('pause-btn');
 const restartTimerBtn = document.getElementById('restart-timer-btn');
@@ -37,7 +35,7 @@ const difficultySelect = document.getElementById('difficulty-select');
 const modeToggleBtn = document.getElementById('mode-toggle');
 const streakDisplay = document.getElementById('streak-display');
 const dailyFactText = document.getElementById('daily-fact-text');
-const lifetimeSolvesDisplay = document.querySelector('.stat-box:nth-child(3) .large-text');
+// Removed: lifetimeSolvesDisplay DOM query
 const badgesListEl = document.getElementById('badges-list');
 const body = document.body;
 
@@ -90,17 +88,17 @@ function generateUniquePuzzle(difficulty) {
 
 // --- CORE STATS UPDATE FUNCTIONS ---
 
-function updateLifetimeSolves() {
-    lifetimeSolves += 1;
-    localStorage.setItem('sudokuLifetimeSolves', lifetimeSolves);
-    lifetimeSolvesDisplay.textContent = lifetimeSolves;
-}
+// Removed: function updateLifetimeSolves()
 
 function updateStreak(solvedToday) {
     const today = getTodayDateString();
     
     if (solvedToday) {
-        if (lastPlayedDate === today) return;
+        // CRITICAL FIX: Only update streak logic if the puzzle hasn't been solved TODAY.
+        if (lastPlayedDate === today) {
+             // Mark as solved, but DO NOT increment streak count.
+             return; 
+        }
 
         const yesterday = new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().split('T')[0];
 
@@ -341,8 +339,7 @@ function startGame(difficulty) {
     startTimer();
     updateStreak(false); // Update streak display only
     
-    // Update dashboard elements on game start
-    lifetimeSolvesDisplay.textContent = lifetimeSolves;
+    // CRITICAL FIX: Removed lifetimeSolvesDisplay.textContent = lifetimeSolves;
     renderBadges();
 }
 
@@ -367,7 +364,7 @@ function handleNotesToggle() {
     notesBtn.classList.toggle('utility-btn', !isNotesMode);
 }
 
-// --- NEW INTELLIGENT HINT LOGIC ---
+// --- NEW INTELLIGENT HINT LOGIC (Remains the same) ---
 function provideHint() {
     if (isPaused) return; 
     
@@ -419,8 +416,9 @@ function checkSolution() {
         isPaused = true; 
         
         // ⭐ SUCCESS ACTIONS! ⭐
+        // CRITICAL FIX: The logic here is now sound to handle the daily streak correctly.
         updateStreak(true); 
-        updateLifetimeSolves(); 
+        // Removed: updateLifetimeSolves();
         grantBadge("Solver Starter", "You've solved your very first puzzle!"); 
         
         alert('🏆 Grandmaster! Puzzle Solved Perfectly. Namaste!');
@@ -451,6 +449,7 @@ function loadModePreference() {
         modeToggleBtn.textContent = '🌙 Dark Mode';
     } else {
         body.classList.remove('light-mode');
+        body.classList.remove('light-mode'); // Double check removal
         modeToggleBtn.textContent = '☀️ Light Mode';
     }
 }
@@ -465,7 +464,7 @@ newGameBtn.addEventListener('click', () => {
 eraseBtn.addEventListener('click', handleErase);
 notesBtn.addEventListener('click', handleNotesToggle);
 checkBtn.addEventListener('click', checkSolution);
-document.getElementById('hint-btn').addEventListener('click', provideHint); // Use the new hint function
+document.getElementById('hint-btn').addEventListener('click', provideHint);
 
 pauseBtn.addEventListener('click', togglePause);
 restartTimerBtn.addEventListener('click', resetTimer);
