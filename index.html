@@ -76,7 +76,7 @@
                 <h3>❓ About Sudoku: A Global Phenomenon</h3>
                 <p>The term "Sudoku" is an abbreviation of the Japanese phrase <mark>"Sūji wa dokushin ni kagiru"</mark> (数字は独身に限る), which translates to "the numbers must be single." This aptly describes the puzzle's fundamental rule: every digit must appear only once in each row, column, and block. Although it gained massive popularity in Japan in the 1980s, its modern structure was invented much earlier.</p>
                 <h4>Who Invented Sudoku?</h4>
-                <p>The earliest known ancestor of Sudoku is the "Latin Square," devised by Swiss mathematician **Leonhard Euler** in the 18th century. However, the 9x9 grid with sub-boxes was first published in 1979 by **Howard Garns**, a freelance architect from the USA, who called his puzzle **"Number Place."** It wasn't until the Japanese puzzle company Nikoli renamed it "Sudoku" that it exploded worldwide in the 2000s.</p>
+                <p>The earliest known ancestor of Sudoku is the "Latin Square," devised by Swiss mathematician Leonhard Euler in the 18th century. However, the 9x9 grid with sub-boxes was first published in 1979 by Howard Garns, a freelance architect from the USA, who called his puzzle "Number Place." It wasn't until the Japanese puzzle company Nikoli renamed it "Sudoku" that it exploded worldwide in the 2000s.</p>
             </div>
 
             <div class="content-module">
@@ -84,8 +84,8 @@
                 <p>The objective is straightforward: fill the empty cells of the 9x9 grid so that every row, every column, and every one of the nine 3x3 subgrids (called 'blocks' or 'regions') contains all of the digits from 1 to 9. The grid starts with some cells already filled, known as 'givens' or 'clues'.</p>
                 <h4>Essential Techniques for Beginners:</h4>
                 <ul>
-                    <li>**Scanning:** Systematically look at each row and column to see where a number (1-9) is missing. This technique is often used to find "Hidden Singles"—cells that can only contain one number because all other possible candidates are blocked by 'givens' in its row, column, or block.</li>
-                    <li>**Marking (Pencil Marks):** Use the Notes Mode to write down all possible candidate digits (1-9) for an empty cell. As you fill in certain numbers, you erase those candidates from the surrounding cells. This is crucial for solving medium and hard puzzles.</li>
+                    <li>Scanning: Systematically look at each row and column to see where a number (1-9) is missing. This technique is often used to find "Hidden Singles"—cells that can only contain one number because all other possible candidates are blocked by 'givens' in its row, column, or block.</li>
+                    <li>Marking (Pencil Marks): Use the Notes Mode to write down all possible candidate digits (1-9) for an empty cell. As you fill in certain numbers, you erase those candidates from the surrounding cells. This is crucial for solving medium and hard puzzles.</li>
                 </ul>
             </div>
 
@@ -93,18 +93,18 @@
                 <h3>🔬 The Math Logic Behind It: Combinatorics and Constraint Satisfaction</h3>
                 <p>Sudoku is not an arithmetic puzzle; it's a combinatorial number-placement puzzle. The science is rooted in:</p>
                 <p class="math-logic-block">
-                The core structure is a **Latin Square**: an $n \times n$ array filled with $n$ different symbols, each occurring exactly once in each row and exactly once in each column. Sudoku adds the extra constraint of the nine 3x3 regions, making it a special type of Latin Square called a **"Graeco-Latin Square"** or **"Orthogonal Latin Square"** configuration.
+                The core structure is a Latin Square: An n*n array filled with n different symbols, each occurring exactly once in each row and exactly once in each column. Sudoku adds the extra constraint of the nine 3x3 regions, making it a special type of Latin Square called a "Graeco-Latin Square" or "Orthogonal Latin Square" configuration.
                 </p>
-                <p>Every well-formed Sudoku puzzle guarantees a **unique solution** (a key requirement for a fair puzzle). The entire solving process relies purely on **Deductive Reasoning**—if a number cannot go in 8 places, it must go in the 9th.</p>
+                <p>Every well-formed Sudoku puzzle guarantees a unique solution (a key requirement for a fair puzzle). The entire solving process relies purely on Deductive Reasoning—if a number cannot go in 8 places, it must go in the 9th.</p>
             </div>
 
             <div class="content-module">
                 <h3>🚀 How to Master Sudoku: Advanced Solving Patterns</h3>
                 <p>Mastery requires recognizing complex patterns that eliminate candidates across multiple regions simultaneously:</p>
                 <ol>
-                    <li>**Naked Pairs/Triples:** If two cells in a row, column, or block only have the same two candidates (e.g., 2 and 7), then 2 and 7 must go in those two cells, and can be removed from all other cells in that region.</li>
-                    <li>**Hidden Pairs/Triples:** If a pair of candidates (e.g., 4 and 8) only appear in two specific cells within a region, those two cells *must* be 4 and 8, even if they have other candidates. All other candidates can be removed from those two cells.</li>
-                    <li>**X-Wing and Swordfish:** These are advanced techniques that look for four cells forming a rectangle in two different rows/columns. If a candidate is only found in those four corners, it creates a powerful elimination chain across the perpendicular rows/columns.</li>
+                    <li>Naked Pairs/Triples: If two cells in a row, column, or block only have the same two candidates (e.g., 2 and 7), then 2 and 7 must go in those two cells, and can be removed from all other cells in that region.</li>
+                    <li>Hidden Pairs/Triples: If a pair of candidates (e.g., 4 and 8) only appear in two specific cells within a region, those two cells must be 4 and 8, even if they have other candidates. All other candidates can be removed from those two cells.</li>
+                    <li>X-Wing and Swordfish: These are advanced techniques that look for four cells forming a rectangle in two different rows/columns. If a candidate is only found in those four corners, it creates a powerful elimination chain across the perpendicular rows/columns.</li>
                 </ol>
             </div>
         </section>
