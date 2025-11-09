@@ -1,0 +1,385 @@
+/* --- Color Variables --- */
+:root {
+    /* DEFAULT: Dark Mode (Green/Black Theme) */
+    --primary-color: #00e676; /* Vibrant Green */
+    --primary-dark: #00c853; /* Darker Green for hover */
+    --text-color: #e8f5e9; /* Light Mint Text */
+    --background-color: #121212; /* True Black */
+    --surface-color: #1e1e1e; /* Dark Surface */
+    --grid-border: #3c3c3c; /* Dark Grey Border */
+    --fixed-cell-bg: #282828; /* Slightly lighter for fixed cells */
+    --selected-cell-bg: #334e3e; /* Subtle Green/Grey for selection */
+    --error-color: #ef5350; /* Red for errors */
+    --user-input-color: #00e676; /* User numbers are bright green */
+}
+
+/* Light Mode Override */
+body.light-mode {
+    --primary-color: #1976d2; /* Vibrant Blue */
+    --primary-dark: #1565c0;
+    --text-color: #212121;
+    --background-color: #f5f5f5;
+    --surface-color: #ffffff;
+    --grid-border: #bdbdbd;
+    --fixed-cell-bg: #e0e0e0;
+    --selected-cell-bg: #bbdefb;
+    --error-color: #e53935;
+    --user-input-color: #1976d2;
+}
+
+/* --- Global Styles --- */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 10px; /* Adjusted padding for better fit on small screens */
+    margin: 0;
+    transition: background-color 0.4s, color 0.4s;
+    min-height: 100vh;
+    position: relative;
+    line-height: 1.6;
+}
+
+/* --- Interactive Background Grid --- */
+.interactive-grid-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 230, 118, 0.03), 
+        rgba(0, 230, 118, 0.03) 40px,
+        transparent 40px,
+        transparent 80px
+    ), repeating-linear-gradient(
+        90deg,
+        rgba(0, 230, 118, 0.03),
+        rgba(0, 230, 118, 0.03) 40px,
+        transparent 40px,
+        transparent 80px
+    );
+    z-index: -1;
+}
+
+/* --- Layout --- */
+main {
+    width: 100%;
+    max-width: 1280px;
+    padding: 20px 0;
+}
+
+header {
+    width: 100%;
+    max-width: 1280px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 10px 0;
+}
+
+h1 {
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    font-weight: 700;
+    /* Ensure H1 shrinks on smaller screens */
+    flex-shrink: 0;
+}
+
+.controls-top {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap; /* Allows controls to wrap on smaller widths */
+    justify-content: flex-end; /* Keeps controls to the right on desktop */
+}
+
+.main-layout {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    margin-bottom: 50px;
+}
+
+/* --- Buttons and Dropdowns --- */
+.action-btn, .dropdown {
+    padding: 10px 18px;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+    border: 1px solid var(--grid-border);
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.primary-btn {
+    background-color: var(--primary-color);
+    color: var(--background-color);
+    border-color: var(--primary-color);
+}
+.primary-btn:hover {
+    background-color: var(--primary-dark);
+    box-shadow: 0 4px 10px rgba(0, 230, 118, 0.3);
+}
+
+.utility-btn:hover {
+    background-color: var(--grid-border);
+}
+
+.stat-timer {
+    font-size: 1.2rem;
+    font-weight: 700;
+    padding: 8px 15px;
+    background-color: var(--surface-color);
+    border-radius: 8px;
+    border: 1px solid var(--grid-border);
+}
+
+/* --- Sidebar (Stats) --- */
+.sidebar {
+    width: 250px;
+    padding: 25px;
+    background-color: var(--surface-color);
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    height: fit-content;
+    flex-shrink: 0; /* Prevents sidebar from shrinking unncessarily */
+}
+
+/* NEW: Daily Fact Box Styling */
+.daily-fact-box {
+    margin-bottom: 30px;
+    padding: 15px;
+    background-color: rgba(0, 230, 118, 0.1);
+    border-radius: 8px;
+    border: 1px solid var(--primary-color);
+}
+/* ... (Stat Box, Badges list styles remain) ... */
+
+.stat-box {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--grid-border);
+}
+.stat-box h3 {
+    margin: 0 0 5px 0;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+.large-text {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+#badges-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+#badges-list li {
+    background-color: var(--primary-color);
+    color: var(--background-color);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+
+/* --- Sudoku Grid (Desktop/Tablet) --- */
+.game-area-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1; 
+}
+
+.sudoku-grid {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: repeat(9, 1fr);
+    /* min(90% viewport width, 540px) -> Optimal for all devices */
+    width: min(90vw, 540px); 
+    height: min(90vw, 540px);
+    border: 4px solid var(--primary-color);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+    background-color: var(--surface-color);
+}
+
+.cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Font size scales based on viewport, stays within limits */
+    font-size: clamp(1.2rem, 4vw, 2.2rem); 
+    border: 1px solid var(--grid-border);
+    cursor: pointer;
+    transition: background-color 0.1s;
+}
+
+/* Thick borders for the 3x3 boxes (desktop/tablet size) */
+.cell:nth-child(3n) { border-right-width: 2px; }
+.cell:nth-child(27n) { border-bottom-width: 4px; }
+.cell:nth-child(n+1):nth-child(-n+9) { border-top-width: 4px; }
+.cell:nth-child(9n+1) { border-left-width: 4px; }
+.cell:nth-child(9n) { border-right-width: 4px; }
+
+/* ... (Cell state styling remains the same) ... */
+
+/* --- Control Panel (Responsive Sizing) --- */
+.controls-bottom {
+    width: min(90vw, 540px);
+    margin-top: 25px;
+}
+
+.number-pad {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.pad-button {
+    min-height: 48px; /* Ensures buttons are easily tappable */
+    padding: 10px 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+    border: 1px solid var(--grid-border);
+    background-color: var(--surface-color);
+    color: var(--primary-color);
+}
+.pad-button:hover {
+    background-color: var(--primary-color);
+    color: var(--background-color);
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+/* --- Informative Content Section --- */
+.info-content {
+    background-color: var(--surface-color);
+    padding: 40px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 900px;
+    margin: 50px auto 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* --- MEDIA QUERIES FOR RESPONSIVENESS --- */
+
+/* 1. Tablet and Medium Screens (Max Width 950px) */
+@media (max-width: 950px) {
+    
+    /* Header optimization for less horizontal space */
+    header {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    h1 {
+        width: 100%;
+        text-align: center;
+        font-size: 2rem;
+    }
+    .controls-top {
+        width: 100%;
+        justify-content: space-around;
+        margin-top: 10px;
+    }
+
+    /* Stack main content (Game + Sidebar) */
+    .main-layout {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+    }
+
+    /* Sidebar and Info Content take full stack width */
+    .sidebar, .info-content {
+        width: min(90vw, 540px);
+    }
+    
+    /* Put the sidebar above the game grid for mobile flow */
+    .sidebar {
+        order: -1; 
+    }
+    
+    /* Grid sizing remains controlled by min(90vw, 540px) */
+    
+    .action-btn, .dropdown {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+}
+
+
+/* 2. Mobile Phone Screens (Max Width 550px) */
+@media (max-width: 550px) {
+    
+    body {
+        padding: 10px;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    /* Stack the top controls entirely for small phones */
+    .controls-top {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .action-btn, .dropdown, .stat-timer {
+        width: 100%;
+        text-align: center;
+        box-sizing: border-box;
+    }
+    
+    /* Grid and controls should use full available width */
+    .sudoku-grid, .controls-bottom, .sidebar {
+        width: 95vw; /* Use a slightly larger percentage */
+        max-width: 350px; /* Cap the size for very large phones */
+    }
+
+    /* Action buttons: wrap to two lines and take up half width */
+    .action-buttons {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .action-buttons button {
+        width: calc(50% - 4px); /* 50% minus half the gap */
+        flex-grow: 0;
+        font-size: 0.85rem;
+        padding: 12px 5px;
+    }
+
+    /* Number pad size adjustment for small screens */
+    .pad-button {
+        font-size: 1.1rem;
+        min-height: 40px;
+        padding: 8px 0;
+    }
+    
+    /* Informative content padding */
+    .info-content {
+        padding: 20px 15px;
+    }
+    .content-module {
+        padding-left: 15px;
+    }
+}
