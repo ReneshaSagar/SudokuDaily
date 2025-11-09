@@ -1,5 +1,8 @@
 /*
  * SUDOKU DAILY Core Game Logic and UI Enhancements
+ *
+ * NOTE: This is the final version implementing functional Notes Mode,
+ * Intelligent Hint, and robust Stat/Badge updating.
  */
 
 // --- Game State Variables ---
@@ -11,6 +14,7 @@ let isNotesMode = false;
 let timerInterval;
 let timeElapsed = 0; 
 let isPaused = false;
+
 // Read data from localStorage, defaulting to 0 or empty structures
 let streak = parseInt(localStorage.getItem('sudokuStreak')) || 0;
 let lastPlayedDate = localStorage.getItem('sudokuLastPlayed') || null;
@@ -19,6 +23,7 @@ let badgesEarned = JSON.parse(localStorage.getItem('sudokuBadges')) || [];
 
 
 // --- DOM Elements ---
+// (These are fine outside the function as they are static IDs)
 const gridEl = document.getElementById('sudoku-grid');
 const pauseBtn = document.getElementById('pause-btn');
 const restartTimerBtn = document.getElementById('restart-timer-btn');
@@ -32,7 +37,7 @@ const difficultySelect = document.getElementById('difficulty-select');
 const modeToggleBtn = document.getElementById('mode-toggle');
 const streakDisplay = document.getElementById('streak-display');
 const dailyFactText = document.getElementById('daily-fact-text');
-const lifetimeSolvesDisplay = document.querySelector('.stat-box:nth-child(3) .large-text'); 
+const lifetimeSolvesDisplay = document.querySelector('.stat-box:nth-child(3) .large-text');
 const badgesListEl = document.getElementById('badges-list');
 const body = document.body;
 
@@ -118,7 +123,6 @@ function grantBadge(badgeName, notificationText) {
         badgesEarned.push(badgeName);
         localStorage.setItem('sudokuBadges', JSON.stringify(badgesEarned));
         
-        // Show notification and update UI
         alert(`⭐ Badge Unlocked! ${notificationText}`);
         renderBadges();
     }
@@ -139,6 +143,10 @@ function renderBadges() {
 
 // --- INITIALIZATION UTILITIES ---
 
+function getTodayDateString() {
+    return new Date().toISOString().split('T')[0];
+}
+
 function displayDailyFact() {
     const today = new Date();
     const startOfYear = new Date(today.getFullYear(), 0, 0);
@@ -156,7 +164,7 @@ function formatTime(seconds) {
     return `${min}:${sec}`;
 }
 
-// --- TIMER CONTROLS LOGIC ---
+// --- TIMER CONTROLS LOGIC (Remains the same) ---
 
 function startTimer() {
     if (timerInterval) clearInterval(timerInterval);
@@ -195,7 +203,7 @@ function resetTimer() {
     startTimer();
 }
 
-// --- CELL HIGHLIGHTING LOGIC ---
+// --- CELL HIGHLIGHTING LOGIC (Remains the same) ---
 
 function removeHighlights() {
     document.querySelectorAll('.cell').forEach(cell => {
@@ -242,6 +250,9 @@ function renderGrid() {
                 if (fixedCells[r][c]) {
                     cell.classList.add('fixed');
                 }
+            } else {
+                // Initialize notes structure for empty cells
+                cell.innerHTML = '<div class="notes-container"></div>';
             }
             
             cell.addEventListener('click', selectCell);
@@ -283,19 +294,32 @@ function handleNumberInput(value) {
     if (fixedCells[r][c]) return;
 
     if (isNotesMode) {
-        const currentValue = selectedCell.textContent.trim();
-        const newValue = value.toString();
-        
-        if (currentValue.includes(newValue)) {
-            selectedCell.textContent = currentValue.replace(new RegExp('\\b' + newValue + '\\b', 'g'), '').trim();
-        } else {
-            selectedCell.textContent = (currentValue + ' ' + newValue).trim();
+        let notesContainer = selectedCell.querySelector('.notes-container');
+        // If it was a number, revert it to notes state
+        if (!notesContainer) {
+            selectedCell.textContent = '';
+            selectedCell.innerHTML = '<div class="notes-container"></div>';
+            notesContainer = selectedCell.querySelector('.notes-container');
         }
-        currentGrid[r][c] = 0; 
 
+        const noteElement = notesContainer.querySelector(`[data-note="${value}"]`);
+
+        if (noteElement) {
+            // Remove the note
+            notesContainer.removeChild(noteElement);
+        } else {
+            // Add the note
+            const newNote = document.createElement('span');
+            newNote.dataset.note = value;
+            newNote.textContent = value;
+            notesContainer.appendChild(newNote);
+        }
+        currentGrid[r][c] = 0; // A cell with notes is considered empty for solving
     } else {
-        currentGrid[r][c] = value;
+        // Value input mode
         selectedCell.textContent = value;
+        selectedCell.innerHTML = value; // Replace notes with number
+        currentGrid[r][c] = value;
         selectedCell.classList.remove('error');
     }
 }
@@ -331,17 +355,45 @@ function handleErase() {
 
     currentGrid[r][c] = 0;
     selectedCell.textContent = '';
+    selectedCell.innerHTML = '<div class="notes-container"></div>'; // Revert to notes state
     selectedCell.classList.remove('error');
 }
 
 function handleNotesToggle() {
-    // FIX: This function should only check for pause, not if the event listener is working.
     if (isPaused) return; 
     isNotesMode = !isNotesMode;
     notesBtn.textContent = isNotesMode ? '✅ Notes ON' : '✏️ Notes Mode';
     notesBtn.classList.toggle('primary-btn', isNotesMode);
     notesBtn.classList.toggle('utility-btn', !isNotesMode);
 }
+
+// --- NEW INTELLIGENT HINT LOGIC ---
+function provideHint() {
+    if (isPaused) return; 
+    
+    // Find the first empty cell
+    for (let r = 0; r < 9; r++) {
+        for (let c = 0; c < 9; c++) {
+            if (currentGrid[r][c] === 0) {
+                const correctValue = solutionGrid[r][c];
+                
+                // 1. Fill the cell
+                currentGrid[r][c] = correctValue;
+                
+                // 2. Update the visual cell
+                const cellEl = gridEl.children[r * 9 + c];
+                cellEl.textContent = correctValue;
+                cellEl.classList.remove('error');
+                
+                // 3. Notify the user
+                alert(`💡 Hint: The correct number for cell (${r + 1}, ${c + 1}) is ${correctValue}.`);
+                return;
+            }
+        }
+    }
+    alert("The puzzle is already complete! You don't need a hint.");
+}
+
 
 function checkSolution() {
     if (isPaused) return; 
@@ -388,8 +440,8 @@ function toggleDarkMode() {
         modeToggleBtn.textContent = '🌙 Dark Mode';
         localStorage.setItem('mode', 'light');
     } else {
+        body.classList.remove('light-mode');
         modeToggleBtn.textContent = '☀️ Light Mode';
-        localStorage.setItem('mode', 'dark');
     }
 }
 
@@ -405,23 +457,16 @@ function loadModePreference() {
 
 
 // --- Event Listeners and Initial Load ---
-// FINAL CHECK: Ensure all elements are linked here!
-
-// Standard Controls
 modeToggleBtn.addEventListener('click', toggleDarkMode);
 newGameBtn.addEventListener('click', () => {
     startGame(difficultySelect.value);
 });
 
-// Game Controls
 eraseBtn.addEventListener('click', handleErase);
-notesBtn.addEventListener('click', handleNotesToggle); // Notes mode should now work
-checkBtn.addEventListener('click', checkSolution);      // Check button should now work
-document.getElementById('hint-btn').addEventListener('click', () => {
-    alert('Hint: Focus on a 3x3 box that is nearly full. This will give you the easiest number to place!');
-});
+notesBtn.addEventListener('click', handleNotesToggle);
+checkBtn.addEventListener('click', checkSolution);
+document.getElementById('hint-btn').addEventListener('click', provideHint); // Use the new hint function
 
-// Timer Controls
 pauseBtn.addEventListener('click', togglePause);
 restartTimerBtn.addEventListener('click', resetTimer);
 
