@@ -70,7 +70,7 @@ body {
     z-index: -1;
 }
 
-/* --- Layout (Desktop/Tablet) --- */
+/* --- Layout --- */
 main {
     width: 100%;
     max-width: 1280px;
@@ -109,7 +109,7 @@ h1 {
     margin-bottom: 50px;
 }
 
-/* --- Buttons, Sidebar, Info Content (Styles remain the same) --- */
+/* --- Buttons and Dropdowns --- */
 .action-btn, .dropdown {
     padding: 10px 18px;
     font-size: 1rem;
@@ -145,17 +145,20 @@ h1 {
     border: 1px solid var(--grid-border);
 }
 
+/* NEW: Timer Controls Group Styling */
 .timer-controls-group {
     display: flex;
     gap: 5px;
     align-items: center;
 }
 .timer-control-btn {
-    padding: 8px 10px;
+    padding: 8px 10px; /* Smaller padding for tighter grouping */
     font-size: 0.8rem;
     font-weight: 500;
 }
 
+
+/* --- Sidebar (Styles remain the same) --- */
 .sidebar {
     width: 250px;
     padding: 25px;
@@ -202,7 +205,7 @@ h1 {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* --- Sudoku Grid --- */
+/* --- Sudoku Grid (Styles remain the same) --- */
 .game-area-center {
     display: flex;
     flex-direction: column;
@@ -214,7 +217,6 @@ h1 {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
     grid-template-rows: repeat(9, 1fr);
-    /* Guarantees the grid maximizes space on mobile but caps size on desktop */
     width: min(90vw, 540px); 
     height: min(90vw, 540px);
     border: 4px solid var(--block-border); 
@@ -274,23 +276,39 @@ h1 {
     font-weight: 600;
 }
 
-/* Notes Mode Styling */
-.notes-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    width: 100%;
-    height: 100%;
-    font-size: clamp(0.4rem, 1.2vw, 0.8rem); /* Small, readable notes */
-    line-height: 1;
-    font-weight: 400;
-    color: var(--text-color);
-    opacity: 0.6;
-}
-.notes-container span {
-    text-align: center;
+
+/* --- Control Panel --- */
+.controls-bottom {
+    width: min(90vw, 540px);
+    margin-top: 25px;
 }
 
+.number-pad {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.pad-button {
+    min-height: 48px;
+    padding: 10px 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+    border: 1px solid var(--grid-border);
+    background-color: var(--surface-color);
+    color: var(--primary-color);
+}
+.pad-button:hover {
+    background-color: var(--primary-color);
+    color: var(--background-color);
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
 
 /* --- Informative Content Section --- */
 .info-content {
@@ -303,12 +321,11 @@ h1 {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-/* --- MEDIA QUERIES (Layout Switching) --- */
+/* --- MEDIA QUERIES FOR RESPONSIVENESS --- */
 
 /* 1. Tablet and Medium Screens (Max Width 950px) */
 @media (max-width: 950px) {
     
-    /* Header Stacking for narrow screens */
     header {
         flex-wrap: wrap;
         justify-content: center;
@@ -324,19 +341,16 @@ h1 {
         margin-top: 10px;
     }
 
-    /* CRITICAL: Stack main content vertically */
     .main-layout {
         flex-direction: column;
         align-items: center;
         gap: 30px;
     }
 
-    /* Sidebar and Info Content take full stack width */
     .sidebar, .info-content {
         width: min(90vw, 540px);
     }
     
-    /* Place the sidebar above the game grid for easier reading */
     .sidebar {
         order: -1; 
     }
@@ -359,7 +373,7 @@ h1 {
         font-size: 1.8rem;
     }
     
-    /* Full control group stacking */
+    /* Timer controls stack with other controls for minimal space */
     .controls-top {
         flex-direction: column;
         gap: 10px;
@@ -370,7 +384,7 @@ h1 {
         box-sizing: border-box;
     }
     
-    /* Timer control group buttons adjust */
+    /* Ensure timer control group buttons adjust */
     .timer-controls-group {
         width: 100%;
         justify-content: space-between;
@@ -380,13 +394,11 @@ h1 {
         width: auto;
     }
 
-    /* Grid and controls size optimization */
     .sudoku-grid, .controls-bottom, .sidebar {
         width: 95vw; 
         max-width: 350px; 
     }
 
-    /* Action buttons: wrap to two lines */
     .action-buttons {
         flex-wrap: wrap;
         gap: 8px;
@@ -398,14 +410,9 @@ h1 {
         padding: 12px 5px;
     }
 
-    /* Number pad optimization */
     .pad-button {
         font-size: 1.1rem;
         min-height: 40px;
         padding: 8px 0;
-    }
-    
-    .info-content {
-        padding: 20px 15px;
     }
 }
