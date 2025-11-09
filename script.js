@@ -1,13 +1,5 @@
 /*
  * SUDOKU DAILY Core Game Logic and UI Enhancements
- *
- * IMPORTANT NOTE ON UNLIMITED PUZZLES:
- * To achieve true "unlimited unique problems" across all difficulties,
- * the section marked '*** PLACE ALGORITHM HERE ***' MUST be replaced by
- * a dedicated Sudoku generation algorithm (e.g., recursive backtracking) 
- * with a uniqueness checker. The current setup uses a simplified randomizer 
- * based on a single solved grid, suitable for immediate launch/testing 
- * but NOT for eternal, guaranteed unique play.
  */
 
 // --- Game State Variables ---
@@ -46,24 +38,17 @@ const dailyFacts = [
     "Your brain processes information faster than a computer can handle: visual information is processed in only 13 milliseconds.",
 ];
 
-// --- Puzzle Generation Blueprint ---
+// --- Puzzle Generation Blueprint (Function remains the same) ---
 function generateUniquePuzzle(difficulty) {
-    // This is a simple, fixed, solved grid used as a starting point.
     const fullSolution1D = [5, 3, 4, 6, 7, 8, 9, 1, 2, 6, 7, 2, 1, 9, 5, 3, 4, 8, 1, 9, 8, 3, 4, 2, 5, 6, 7, 8, 5, 9, 7, 6, 1, 4, 2, 3, 4, 2, 6, 8, 5, 3, 7, 9, 1, 7, 1, 3, 9, 2, 4, 8, 5, 6, 9, 6, 1, 5, 3, 7, 2, 8, 4, 2, 8, 7, 4, 1, 9, 6, 3, 5, 3, 4, 5, 2, 8, 6, 1, 7, 9];
     let startPuzzle1D = [...fullSolution1D];
-
-    // *** PLACE ALGORITHM HERE ***
-    // Replace the simple implementation below with a true generator.
-    // The generator should return a unique solved grid and the puzzle grid 
-    // based on the requested 'difficulty' (number of cells removed).
     
     let cellsToRemove;
-    if (difficulty === 'easy') cellsToRemove = 25; // ~56 filled
-    else if (difficulty === 'medium') cellsToRemove = 45; // ~36 filled
-    else if (difficulty === 'hard') cellsToRemove = 55; // ~26 filled
-    else cellsToRemove = 60; // ~21 filled
+    if (difficulty === 'easy') cellsToRemove = 25; 
+    else if (difficulty === 'medium') cellsToRemove = 45; 
+    else if (difficulty === 'hard') cellsToRemove = 55; 
+    else cellsToRemove = 60;
 
-    // Simplified randomized removal (NOT guaranteed unique solution)
     for (let i = 0; i < cellsToRemove; i++) {
         let index;
         do {
@@ -72,7 +57,6 @@ function generateUniquePuzzle(difficulty) {
         startPuzzle1D[index] = 0;
     }
 
-    // Convert 1D arrays to 9x9 2D arrays
     const grid2D = [];
     const solution2D = [];
     for (let i = 0; i < 9; i++) {
@@ -118,7 +102,6 @@ function updateStreak(solvedToday) {
 
 function displayDailyFact() {
     const today = new Date();
-    // Use the day of the year to cycle through facts
     const startOfYear = new Date(today.getFullYear(), 0, 0);
     const diff = today - startOfYear;
     const oneDay = 1000 * 60 * 60 * 24;
@@ -129,11 +112,42 @@ function displayDailyFact() {
 }
 
 
+// --- Cell Highlighting Logic ---
+
+function removeHighlights() {
+    document.querySelectorAll('.cell').forEach(cell => {
+        cell.classList.remove('selected', 'highlight');
+    });
+}
+
+function applyHighlights(r, c) {
+    // 1. Highlight the entire row and column
+    for (let i = 0; i < 9; i++) {
+        const rowCell = gridEl.children[r * 9 + i];
+        const colCell = gridEl.children[i * 9 + c];
+        
+        if (rowCell && rowCell !== selectedCell) rowCell.classList.add('highlight');
+        if (colCell && colCell !== selectedCell) colCell.classList.add('highlight');
+    }
+
+    // 2. Highlight the 3x3 block
+    const startRow = Math.floor(r / 3) * 3;
+    const startCol = Math.floor(c / 3) * 3;
+
+    for (let row = startRow; row < startRow + 3; row++) {
+        for (let col = startCol; col < startCol + 3; col++) {
+            const blockCell = gridEl.children[row * 9 + col];
+            if (blockCell && blockCell !== selectedCell) {
+                blockCell.classList.add('highlight');
+            }
+        }
+    }
+}
+
 // --- Game Controls and UI Logic ---
 
 function renderGrid() {
     gridEl.innerHTML = ''; 
-    // ... (Grid rendering logic remains the same)
     for (let r = 0; r < 9; r++) {
         for (let c = 0; c < 9; c++) {
             const cell = document.createElement('div');
@@ -166,12 +180,15 @@ function renderGrid() {
 }
 
 function selectCell(event) {
-    if (selectedCell) {
-        selectedCell.classList.remove('selected');
-    }
+    removeHighlights(); // Remove all previous highlights
 
     selectedCell = event.target;
-    selectedCell.classList.add('selected');
+    selectedCell.classList.add('selected'); // Add selection highlight
+
+    const r = parseInt(selectedCell.dataset.row);
+    const c = parseInt(selectedCell.dataset.col);
+    
+    applyHighlights(r, c); // Apply contextual highlights
 }
 
 function handleNumberInput(value) {
@@ -202,6 +219,7 @@ function handleNumberInput(value) {
 
 function startGame(difficulty) {
     clearInterval(timerInterval);
+    removeHighlights(); // Ensure no cells are highlighted on new game
     const puzzle = generateUniquePuzzle(difficulty);
     currentGrid = puzzle.currentGrid;
     solutionGrid = puzzle.solutionGrid;
@@ -273,7 +291,7 @@ function checkSolution() {
 }
 
 
-// --- Mode Toggle Logic ---
+// --- Mode Toggle Logic (Functions remain the same) ---
 
 function toggleDarkMode() {
     body.classList.toggle('light-mode');
@@ -306,7 +324,7 @@ eraseBtn.addEventListener('click', handleErase);
 notesBtn.addEventListener('click', handleNotesToggle);
 checkBtn.addEventListener('click', checkSolution);
 document.getElementById('hint-btn').addEventListener('click', () => {
-    alert('Hint: Focus on a $3 \times 3$ box that is nearly full. This will give you the easiest number to place!');
+    alert('Hint: Focus on a 3x3 box that is nearly full. This will give you the easiest number to place!');
 });
 
 
