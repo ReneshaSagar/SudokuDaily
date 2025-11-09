@@ -70,7 +70,7 @@ body {
     z-index: -1;
 }
 
-/* --- Layout --- */
+/* --- Layout (Desktop/Tablet) --- */
 main {
     width: 100%;
     max-width: 1280px;
@@ -145,6 +145,17 @@ h1 {
     border: 1px solid var(--grid-border);
 }
 
+.timer-controls-group {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+.timer-control-btn {
+    padding: 8px 10px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
 .sidebar {
     width: 250px;
     padding: 25px;
@@ -191,16 +202,6 @@ h1 {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.info-content {
-    background-color: var(--surface-color);
-    padding: 40px;
-    border-radius: 12px;
-    width: 100%;
-    max-width: 900px;
-    margin: 50px auto 30px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-}
-
 /* --- Sudoku Grid --- */
 .game-area-center {
     display: flex;
@@ -213,9 +214,9 @@ h1 {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
     grid-template-rows: repeat(9, 1fr);
+    /* Guarantees the grid maximizes space on mobile but caps size on desktop */
     width: min(90vw, 540px); 
     height: min(90vw, 540px);
-    /* Outer border uses primary color and is thick */
     border: 4px solid var(--block-border); 
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
     background-color: var(--surface-color);
@@ -226,105 +227,70 @@ h1 {
     justify-content: center;
     align-items: center;
     font-size: clamp(1.2rem, 4vw, 2.2rem); 
-    /* Default inner border is thin and dark/light grey */
     border: 1px solid var(--grid-border); 
     cursor: pointer;
     transition: background-color 0.1s;
 }
 
-/* --- THE KEY CHANGES FOR 3X3 BLOCK BORDERS --- */
-
-/* Horizontal Divider Lines (3rd and 6th row) */
-/* Target all cells in the 3rd, 4th, 6th, and 7th rows to set the bottom or top thick border */
+/* Thicker Borders for 3x3 Blocks */
 .cell:nth-child(n) {
-    border-bottom-width: 1px; /* Reset */
+    border-bottom-width: 1px;
     border-bottom-color: var(--grid-border);
 }
-/* Target rows 3 and 6 (cells 19-27 and 46-54) for a thick bottom border */
 .sudoku-grid div:nth-child(n+19):nth-child(-n+27),
 .sudoku-grid div:nth-child(n+46):nth-child(-n+54) {
     border-bottom-width: 3px; 
     border-bottom-color: var(--block-border);
 }
-
-/* Vertical Divider Lines (3rd and 6th column) */
-/* Target every 3rd cell (3, 6, 12, 15, 21, 24, etc.) for a thick right border */
 .cell:nth-child(3n) {
     border-right-width: 3px;
     border-right-color: var(--block-border);
 }
 
-/* Ensure the outer border is defined on the grid container, not the cells, and the thin border is defined on the cell */
-
-/* Corner Cases (Setting the outer border thickness) */
-.cell:nth-child(9n+1) { border-left-width: 1px; } /* Reset left border of the first column */
-.cell:nth-child(1):nth-child(9n+1) { border-left-width: 1px; } /* Reset top-left cell */
-.cell:nth-child(9n) { border-right-width: 3px; } /* Reset right border of the last column */
+.cell:nth-child(9n+1) { border-left-width: 1px; } 
+.cell:nth-child(9n) { border-right-width: 4px; }
 
 
-/* 1. Contextual Highlighting for Row/Column/Block */
+/* Contextual & State Highlighting */
 .cell.highlight {
     background-color: var(--highlight-bg);
 }
-
-/* 2. Selected Cell (Overrides Highlight) */
 .cell.selected {
     background-color: var(--selected-cell-bg);
     box-shadow: inset 0 0 0 2px var(--primary-color); 
 }
-
-/* 3. Error Cell (Highest Priority - Overrides Selected/Highlight) */
 .cell.error {
     background-color: var(--error-color) !important; 
     color: white;
 }
-
-/* Fixed Cells and User Input Colors remain */
 .cell.fixed {
     background-color: var(--fixed-cell-bg);
     font-weight: 700;
     color: var(--text-color);
     cursor: default;
 }
-
 .cell:not(.fixed) {
     color: var(--user-input-color); 
     font-weight: 600;
 }
 
-
-/* --- Control Panel --- */
-.controls-bottom {
-    width: min(90vw, 540px);
-    margin-top: 25px;
-}
-
-.number-pad {
+/* Notes Mode Styling */
+.notes-container {
     display: grid;
-    grid-template-columns: repeat(9, 1fr);
-    gap: 8px;
-    margin-bottom: 20px;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    width: 100%;
+    height: 100%;
+    font-size: clamp(0.4rem, 1.2vw, 0.8rem); /* Small, readable notes */
+    line-height: 1;
+    font-weight: 400;
+    color: var(--text-color);
+    opacity: 0.6;
+}
+.notes-container span {
+    text-align: center;
 }
 
-.pad-button {
-    min-height: 48px;
-    padding: 10px 0;
-    font-size: 1.4rem;
-    font-weight: 700;
-    border: 1px solid var(--grid-border);
-    background-color: var(--surface-color);
-    color: var(--primary-color);
-}
-.pad-button:hover {
-    background-color: var(--primary-color);
-    color: var(--background-color);
-}
-
-.action-buttons {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-}
 
 /* --- Informative Content Section --- */
 .info-content {
@@ -337,11 +303,12 @@ h1 {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-/* --- MEDIA QUERIES FOR RESPONSIVENESS (Maintain Layout Integrity) --- */
+/* --- MEDIA QUERIES (Layout Switching) --- */
 
 /* 1. Tablet and Medium Screens (Max Width 950px) */
 @media (max-width: 950px) {
     
+    /* Header Stacking for narrow screens */
     header {
         flex-wrap: wrap;
         justify-content: center;
@@ -357,16 +324,19 @@ h1 {
         margin-top: 10px;
     }
 
+    /* CRITICAL: Stack main content vertically */
     .main-layout {
         flex-direction: column;
         align-items: center;
         gap: 30px;
     }
 
+    /* Sidebar and Info Content take full stack width */
     .sidebar, .info-content {
         width: min(90vw, 540px);
     }
     
+    /* Place the sidebar above the game grid for easier reading */
     .sidebar {
         order: -1; 
     }
@@ -389,6 +359,7 @@ h1 {
         font-size: 1.8rem;
     }
     
+    /* Full control group stacking */
     .controls-top {
         flex-direction: column;
         gap: 10px;
@@ -399,11 +370,23 @@ h1 {
         box-sizing: border-box;
     }
     
+    /* Timer control group buttons adjust */
+    .timer-controls-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .timer-control-btn {
+        flex-grow: 1;
+        width: auto;
+    }
+
+    /* Grid and controls size optimization */
     .sudoku-grid, .controls-bottom, .sidebar {
         width: 95vw; 
         max-width: 350px; 
     }
 
+    /* Action buttons: wrap to two lines */
     .action-buttons {
         flex-wrap: wrap;
         gap: 8px;
@@ -415,6 +398,7 @@ h1 {
         padding: 12px 5px;
     }
 
+    /* Number pad optimization */
     .pad-button {
         font-size: 1.1rem;
         min-height: 40px;
