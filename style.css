@@ -6,23 +6,27 @@
     --text-color: #e8f5e9; /* Light Mint Text */
     --background-color: #121212; /* True Black */
     --surface-color: #1e1e1e; /* Dark Surface */
-    --grid-border: #3c3c3c; /* Dark Grey Border */
-    --fixed-cell-bg: #282828; /* Slightly lighter for fixed cells */
-    --selected-cell-bg: #334e3e; /* Subtle Green/Grey for selection */
-    --error-color: #ef5350; /* Red for errors */
-    --user-input-color: #00e676; /* User numbers are bright green */
+    --grid-border: #3c3c3c; /* Dark Grey Border (Inner thin lines) */
+    --block-border: var(--primary-color); /* Thicker border color */
+    --fixed-cell-bg: #282828; 
+    --selected-cell-bg: #334e3e; 
+    --highlight-bg: #2b3a32; 
+    --error-color: #ef5350; 
+    --user-input-color: #00e676;
 }
 
 /* Light Mode Override */
 body.light-mode {
-    --primary-color: #1976d2; /* Vibrant Blue */
+    --primary-color: #1976d2; 
     --primary-dark: #1565c0;
     --text-color: #212121;
     --background-color: #f5f5f5;
     --surface-color: #ffffff;
     --grid-border: #bdbdbd;
+    --block-border: var(--primary-color);
     --fixed-cell-bg: #e0e0e0;
     --selected-cell-bg: #bbdefb;
+    --highlight-bg: #e3f2fd;
     --error-color: #e53935;
     --user-input-color: #1976d2;
 }
@@ -35,7 +39,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px 10px; /* Adjusted padding for better fit on small screens */
+    padding: 20px 10px; 
     margin: 0;
     transition: background-color 0.4s, color 0.4s;
     min-height: 100vh;
@@ -87,7 +91,6 @@ h1 {
     color: var(--primary-color);
     font-size: 2.5rem;
     font-weight: 700;
-    /* Ensure H1 shrinks on smaller screens */
     flex-shrink: 0;
 }
 
@@ -95,8 +98,8 @@ h1 {
     display: flex;
     gap: 15px;
     align-items: center;
-    flex-wrap: wrap; /* Allows controls to wrap on smaller widths */
-    justify-content: flex-end; /* Keeps controls to the right on desktop */
+    flex-wrap: wrap; 
+    justify-content: flex-end; 
 }
 
 .main-layout {
@@ -106,7 +109,7 @@ h1 {
     margin-bottom: 50px;
 }
 
-/* --- Buttons and Dropdowns --- */
+/* --- Buttons, Sidebar, Info Content (Styles remain the same) --- */
 .action-btn, .dropdown {
     padding: 10px 18px;
     font-size: 1rem;
@@ -142,7 +145,6 @@ h1 {
     border: 1px solid var(--grid-border);
 }
 
-/* --- Sidebar (Stats) --- */
 .sidebar {
     width: 250px;
     padding: 25px;
@@ -150,10 +152,9 @@ h1 {
     border-radius: 12px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
     height: fit-content;
-    flex-shrink: 0; /* Prevents sidebar from shrinking unncessarily */
+    flex-shrink: 0; 
 }
 
-/* NEW: Daily Fact Box Styling */
 .daily-fact-box {
     margin-bottom: 30px;
     padding: 15px;
@@ -161,19 +162,13 @@ h1 {
     border-radius: 8px;
     border: 1px solid var(--primary-color);
 }
-/* ... (Stat Box, Badges list styles remain) ... */
 
 .stat-box {
     margin-bottom: 20px;
     padding-bottom: 10px;
     border-bottom: 1px solid var(--grid-border);
 }
-.stat-box h3 {
-    margin: 0 0 5px 0;
-    color: var(--primary-color);
-    font-size: 1.1rem;
-    font-weight: 600;
-}
+
 .large-text {
     font-size: 1.8rem;
     font-weight: 700;
@@ -196,8 +191,17 @@ h1 {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+.info-content {
+    background-color: var(--surface-color);
+    padding: 40px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 900px;
+    margin: 50px auto 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
 
-/* --- Sudoku Grid (Desktop/Tablet) --- */
+/* --- Sudoku Grid --- */
 .game-area-center {
     display: flex;
     flex-direction: column;
@@ -209,10 +213,10 @@ h1 {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
     grid-template-rows: repeat(9, 1fr);
-    /* min(90% viewport width, 540px) -> Optimal for all devices */
     width: min(90vw, 540px); 
     height: min(90vw, 540px);
-    border: 4px solid var(--primary-color);
+    /* Outer border uses primary color and is thick */
+    border: 4px solid var(--block-border); 
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
     background-color: var(--surface-color);
 }
@@ -221,23 +225,75 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Font size scales based on viewport, stays within limits */
     font-size: clamp(1.2rem, 4vw, 2.2rem); 
-    border: 1px solid var(--grid-border);
+    /* Default inner border is thin and dark/light grey */
+    border: 1px solid var(--grid-border); 
     cursor: pointer;
     transition: background-color 0.1s;
 }
 
-/* Thick borders for the 3x3 boxes (desktop/tablet size) */
-.cell:nth-child(3n) { border-right-width: 2px; }
-.cell:nth-child(27n) { border-bottom-width: 4px; }
-.cell:nth-child(n+1):nth-child(-n+9) { border-top-width: 4px; }
-.cell:nth-child(9n+1) { border-left-width: 4px; }
-.cell:nth-child(9n) { border-right-width: 4px; }
+/* --- THE KEY CHANGES FOR 3X3 BLOCK BORDERS --- */
 
-/* ... (Cell state styling remains the same) ... */
+/* Horizontal Divider Lines (3rd and 6th row) */
+/* Target all cells in the 3rd, 4th, 6th, and 7th rows to set the bottom or top thick border */
+.cell:nth-child(n) {
+    border-bottom-width: 1px; /* Reset */
+    border-bottom-color: var(--grid-border);
+}
+/* Target rows 3 and 6 (cells 19-27 and 46-54) for a thick bottom border */
+.sudoku-grid div:nth-child(n+19):nth-child(-n+27),
+.sudoku-grid div:nth-child(n+46):nth-child(-n+54) {
+    border-bottom-width: 3px; 
+    border-bottom-color: var(--block-border);
+}
 
-/* --- Control Panel (Responsive Sizing) --- */
+/* Vertical Divider Lines (3rd and 6th column) */
+/* Target every 3rd cell (3, 6, 12, 15, 21, 24, etc.) for a thick right border */
+.cell:nth-child(3n) {
+    border-right-width: 3px;
+    border-right-color: var(--block-border);
+}
+
+/* Ensure the outer border is defined on the grid container, not the cells, and the thin border is defined on the cell */
+
+/* Corner Cases (Setting the outer border thickness) */
+.cell:nth-child(9n+1) { border-left-width: 1px; } /* Reset left border of the first column */
+.cell:nth-child(1):nth-child(9n+1) { border-left-width: 1px; } /* Reset top-left cell */
+.cell:nth-child(9n) { border-right-width: 3px; } /* Reset right border of the last column */
+
+
+/* 1. Contextual Highlighting for Row/Column/Block */
+.cell.highlight {
+    background-color: var(--highlight-bg);
+}
+
+/* 2. Selected Cell (Overrides Highlight) */
+.cell.selected {
+    background-color: var(--selected-cell-bg);
+    box-shadow: inset 0 0 0 2px var(--primary-color); 
+}
+
+/* 3. Error Cell (Highest Priority - Overrides Selected/Highlight) */
+.cell.error {
+    background-color: var(--error-color) !important; 
+    color: white;
+}
+
+/* Fixed Cells and User Input Colors remain */
+.cell.fixed {
+    background-color: var(--fixed-cell-bg);
+    font-weight: 700;
+    color: var(--text-color);
+    cursor: default;
+}
+
+.cell:not(.fixed) {
+    color: var(--user-input-color); 
+    font-weight: 600;
+}
+
+
+/* --- Control Panel --- */
 .controls-bottom {
     width: min(90vw, 540px);
     margin-top: 25px;
@@ -251,7 +307,7 @@ h1 {
 }
 
 .pad-button {
-    min-height: 48px; /* Ensures buttons are easily tappable */
+    min-height: 48px;
     padding: 10px 0;
     font-size: 1.4rem;
     font-weight: 700;
@@ -281,12 +337,11 @@ h1 {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-/* --- MEDIA QUERIES FOR RESPONSIVENESS --- */
+/* --- MEDIA QUERIES FOR RESPONSIVENESS (Maintain Layout Integrity) --- */
 
 /* 1. Tablet and Medium Screens (Max Width 950px) */
 @media (max-width: 950px) {
     
-    /* Header optimization for less horizontal space */
     header {
         flex-wrap: wrap;
         justify-content: center;
@@ -302,24 +357,19 @@ h1 {
         margin-top: 10px;
     }
 
-    /* Stack main content (Game + Sidebar) */
     .main-layout {
         flex-direction: column;
         align-items: center;
         gap: 30px;
     }
 
-    /* Sidebar and Info Content take full stack width */
     .sidebar, .info-content {
         width: min(90vw, 540px);
     }
     
-    /* Put the sidebar above the game grid for mobile flow */
     .sidebar {
         order: -1; 
     }
-    
-    /* Grid sizing remains controlled by min(90vw, 540px) */
     
     .action-btn, .dropdown {
         padding: 8px 12px;
@@ -339,7 +389,6 @@ h1 {
         font-size: 1.8rem;
     }
     
-    /* Stack the top controls entirely for small phones */
     .controls-top {
         flex-direction: column;
         gap: 10px;
@@ -350,36 +399,29 @@ h1 {
         box-sizing: border-box;
     }
     
-    /* Grid and controls should use full available width */
     .sudoku-grid, .controls-bottom, .sidebar {
-        width: 95vw; /* Use a slightly larger percentage */
-        max-width: 350px; /* Cap the size for very large phones */
+        width: 95vw; 
+        max-width: 350px; 
     }
 
-    /* Action buttons: wrap to two lines and take up half width */
     .action-buttons {
         flex-wrap: wrap;
         gap: 8px;
     }
     .action-buttons button {
-        width: calc(50% - 4px); /* 50% minus half the gap */
+        width: calc(50% - 4px); 
         flex-grow: 0;
         font-size: 0.85rem;
         padding: 12px 5px;
     }
 
-    /* Number pad size adjustment for small screens */
     .pad-button {
         font-size: 1.1rem;
         min-height: 40px;
         padding: 8px 0;
     }
     
-    /* Informative content padding */
     .info-content {
         padding: 20px 15px;
-    }
-    .content-module {
-        padding-left: 15px;
     }
 }
