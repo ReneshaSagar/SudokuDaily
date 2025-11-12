@@ -46,7 +46,7 @@ const dailyFacts = [
     "Learning new complex skills, like Sudoku, actively promotes the growth of new neural connections.",
     "The maximum number of givens (pre-filled cells) a Sudoku puzzle can have while still lacking a unique solution is 77.",
     "The human brain generates about 12 to 25 watts of power—enough to light a low-watt LED bulb!",
-    "It is estimated that there are 6,670,903,752,021,072,936,960 possible completed $9 \times 9$ Sudoku grids.",
+    "It is estimated that there are 6,670,903,752,021,072,936,960 possible completed 9*9 Sudoku grids.",
     "The term 'Latin Square' (the mathematical basis of Sudoku) was first used by Leonard Euler in 1783.",
     "A Sudoku puzzle must have at least 17 givens (pre-filled numbers) to guarantee a unique solution.",
     "Your brain processes information faster than a computer can handle: visual information is processed in only 13 milliseconds.",
@@ -474,3 +474,4 @@ restartTimerBtn.addEventListener('click', resetTimer);
 loadModePreference();
 displayDailyFact();
 startGame(difficultySelect.value);
+
